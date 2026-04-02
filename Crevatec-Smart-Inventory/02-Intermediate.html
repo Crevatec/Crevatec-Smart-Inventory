@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Crevatec | Intermediate Inventory</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #ecf0f1; color: #34495e; padding: 40px; }
+        .box { background: white; border-top: 5px solid #e67e22; padding: 25px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-radius: 8px; max-width: 800px; margin: auto; }
+        h2 { margin-top: 0; color: #34495e; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; }
+        .input-group { margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+        input { padding: 12px; border: 1px solid #bdc3c7; border-radius: 4px; flex: 1; min-width: 150px; }
+        button { background: #34495e; color: white; border: none; padding: 12px 25px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: 0.3s; }
+        button:hover { background: #e67e22; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #f8f9fa; padding: 12px; text-align: left; border-bottom: 2px solid #e67e22; }
+        td { padding: 12px; border-bottom: 1px solid #eee; }
+        tr:hover { background: #fdfdfd; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>Crevatec Inventory Dashboard</h2>
+        
+        <div class="input-group">
+            <input type="text" id="itemName" placeholder="Product Name">
+            <input type="number" id="itemQty" placeholder="Quantity">
+            <input type="number" id="itemPrice" placeholder="Unit Price">
+            <button onclick="process()">Update Stock</button>
+        </div>
+
+        <div id="output">
+            </div>
+    </div>
+
+    <script>
+        // INHERITED LOGIC + INTERMEDIATE PERSISTENCE
+        let db = JSON.parse(localStorage.getItem('crevatec_inventory')) || [];
+
+        function process() {
+            const name = document.getElementById('itemName').value;
+            const qty = parseFloat(document.getElementById('itemQty').value);
+            const price = parseFloat(document.getElementById('itemPrice').value);
+
+            // ADJUSTMENT: Validation Logic (Ensures high data quality for the customer)
+            if (name === "" || isNaN(qty) || isNaN(price)) {
+                alert("Please fill all fields with valid data.");
+                return;
+            }
+
+            // Logic inherited from Level 1
+            const newItem = { 
+                name: name, 
+                qty: qty, 
+                price: price, 
+                total: (qty * price).toFixed(2) 
+            };
+
+            db.push(newItem);
+            localStorage.setItem('crevatec_inventory', JSON.stringify(db));
+            
+            // Clear inputs for next entry
+            document.getElementById('itemName').value = "";
+            document.getElementById('itemQty').value = "";
+            document.getElementById('itemPrice').value = "";
+            
+            render();
+        }
+
+        function render() {
+            if (db.length === 0) {
+                document.getElementById('output').innerHTML = "<p>No items in stock.</p>";
+                return;
+            }
+
+            // ADJUSTMENT: Table-based visualization for professional audit
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item Name</th>
+                            <th>Qty</th>
+                            <th>Price</th>
+                            <th>Total Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+            
+            db.forEach(i => {
+                html += `
+                    <tr>
+                        <td>${i.name}</td>
+                        <td>${i.qty}</td>
+                        <td>$${i.price}</td>
+                        <td>$${i.total}</td>
+                    </tr>`;
+            });
+
+            html += "</tbody></table>";
+            document.getElementById('output').innerHTML = html;
+        }
+        
+        // Initial render on page load
+        render();
+    </script>
+</body>
+</html>
